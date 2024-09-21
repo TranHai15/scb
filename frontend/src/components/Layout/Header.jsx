@@ -48,13 +48,13 @@ export default function Header() {
           <div className="flex gap-5">
             <button
               className="bg-red-100 py-2 px-4 text-lg rounded hover:bg-red-200 transition"
-              onClick={() => navigate(`/login`)}
+              onClick={() => navigate(`/signup`)}
             >
               Sign up
             </button>
             <button
               className="bg-red-100 py-2 px-4 text-lg rounded hover:bg-red-200 transition"
-              onClick={() => navigate(`/signup`)}
+              onClick={() => navigate(`/login`)}
             >
               Log in
             </button>
