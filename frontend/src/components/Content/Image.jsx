@@ -1,19 +1,31 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Thêm useNavigate
 import Home from "./Home";
 
 export default function Image() {
-  const [imageSrc, setImageSrc] = useState(null); // Để lưu đường dẫn ảnh
+  const [imageSrc, setImageSrc] = useState(null);
+  const navigate = useNavigate(); // Khởi tạo navigate
 
-  // Hàm xử lý khi người dùng chọn ảnh
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImageSrc(reader.result); // Lưu đường dẫn hình ảnh vào state
+        setImageSrc(reader.result);
       };
-      reader.readAsDataURL(file); // Đọc ảnh dưới dạng URL
+      reader.readAsDataURL(file);
     }
+  };
+  // ham xoa anh hien tai them anh moi
+  const handleChangeImage = () => {
+    let fileInput = document.getElementById("fileInput");
+    fileInput.click();
+  };
+
+  // Hàm xử lý khi nhấn nút "Stop"
+  const handleStop = () => {
+    alert("BAn Muon THE U");
+    navigate(`/`); // Điều hướng về trang Home
   };
 
   return (
@@ -29,17 +41,11 @@ export default function Image() {
             id="fileInput"
             accept="image/*"
             className="text-lg mt-4"
-            onChange={handleImageChange} // Gọi hàm khi người dùng chọn ảnh
+            onChange={handleImageChange}
           />
-
-          {/* Hiển thị hình ảnh khi có ảnh được chọn */}
           {imageSrc && (
             <div className="mt-6">
-              <h2
-                id="detecting-text"
-                className="text-3xl font-semibold flex-none my-4"
-                //   style={{ display: "none" }}
-              >
+              <h2 className="text-3xl font-semibold flex-none my-4">
                 Detecting...
               </h2>
               <img
@@ -49,14 +55,18 @@ export default function Image() {
               />
             </div>
           )}
-
-          {/* Hiển thị nút chỉ khi có ảnh được chọn */}
           {imageSrc && (
-            <div className="buttons mt-6 mb-20  flex justify-center gap-5">
-              <button className="bg-red-100 p-3 rounded-lg shadow-lg hover:bg-red-200 transition">
+            <div className="buttons mt-6 mb-20 flex justify-center gap-5">
+              <button
+                className="bg-red-100 p-3 rounded-lg shadow-lg hover:bg-red-200 transition"
+                onClick={handleStop} // Gọi hàm khi nhấn "Stop"
+              >
                 Stop
               </button>
-              <button className="bg-red-100 p-3 rounded-lg shadow-lg hover:bg-red-200 transition">
+              <button
+                className="bg-red-100 p-3 rounded-lg shadow-lg hover:bg-red-200 transition"
+                onClick={handleChangeImage}
+              >
                 Change Image
               </button>
             </div>

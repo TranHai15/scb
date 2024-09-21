@@ -59,7 +59,7 @@ export default function UserGuide() {
             <li className="text-lg">
               <p className="font-semibold">Q: How do I upload a PCB file?</p>
               <p>
-                A: You can upload a PCB file by clicking the "Upload file"
+                A: You can upload a PCB file by clicking the "Upload files"
                 button and selecting the file from your computer.
               </p>
             </li>

@@ -1,12 +1,12 @@
 import "./index.css";
 import { Routes, Route } from "react-router-dom";
-import Header from "./components/Header";
-import Home from "./components/Home";
-import Camera from "./components/Camera";
-import Image from "./components/Image";
-import UserGuide from "./components/User-guide";
-import LoginPage from "./components/Login";
-import SignupPage from "./components/Signup";
+import { Header } from "./components";
+import { Home } from "./components";
+import { Camera } from "./components";
+import { Image } from "./components";
+import { UserGuide } from "./components";
+import { LoginPage } from "./components";
+import { SignupPage } from "./components";
 
 function App() {
   return (
