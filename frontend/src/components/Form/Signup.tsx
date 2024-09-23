@@ -1,16 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  const registerUser = async (userData) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/register",
+        userData
+      );
+      console.log("Đăng ký thành công:", response.data);
+      setMessage(response.data);
+      navigate(`/login`);
+    } catch (error) {
+      setError(
+        error.response ? error.response.data : "Khong co phan hoi tu may chu"
+      );
+    }
+  };
+
   const onSubmit = (data) => {
-    console.log(data);
-    alert("Signup successful!");
+    registerUser({ data });
   };
 
   return (
@@ -60,6 +80,7 @@ export default function SignupPage() {
                 {errors.email.message}
               </p>
             )}
+            <p className="text-red-500 text-sm mt-1">{error}</p>
           </div>
           <div className="mb-6">
             <label
