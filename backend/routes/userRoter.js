@@ -10,6 +10,11 @@ const userController = require("../controllers/userController");
 //  lay toan bo nguoi dung
 router.get("/", middlewares.verifyTokenAdmin, userController.getAllusers);
 // xoa nguoi dung
-router.delete("/delete/:id", userController.deleteUser);
-
+router.delete(
+  "/delete/:id",
+  middlewares.verifyToken,
+  userController.deleteUser
+);
+// dieu huong bat dang nhap
+router.get("/userguide", middlewares.verifyToken);
 module.exports = router;

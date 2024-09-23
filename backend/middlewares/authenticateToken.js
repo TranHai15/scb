@@ -4,20 +4,21 @@ const jwt = require("jsonwebtoken");
 const middlewares = {
   // Kiểm tra trạng thái đăng nhập
   verifyToken: (req, res, next) => {
-    const token = req.headers.token;
-    if (token) {
-      const accessToken = token.split(" ")[1]; // Đổi assetToken thành accessToken
-      jwt.verify(accessToken, process.env.JWT_ASSECT_TOKEN, (error, user) => {
+    const authHeader = req.headers.authorization;
+    console.log("aaaaaaa", authHeader);
+    if (authHeader) {
+      const accessToken = authHeader.split(" ")[1];
+      console.log("Access Token:", accessToken); // Ghi log token
+
+      jwt.verify(accessToken, process.env.JWT_ACCESS_TOKEN, (error, user) => {
         if (error) {
-          console.log("Token đã hết hạn");
-          return res.status(403).json("Token đã hết hạn."); // Sử dụng return để dừng hàm
+          return res.status(403).json("Token đã hết hạn.");
         }
-        req.user = user;
-        next(); // Chỉ gọi next() nếu không có lỗi
+        req.user = user; // Lưu thông tin user vào request
+        next();
       });
     } else {
-      console.log("Bạn chưa đăng nhập");
-      return res.status(401).json("Bạn chưa đăng nhập."); // Sử dụng return để dừng hàm
+      return res.status(401).json("Bạn chưa đăng nhập.");
     }
   },
 
@@ -25,7 +26,7 @@ const middlewares = {
   verifyTokenAdmin: (req, res, next) => {
     middlewares.verifyToken(req, res, () => {
       console.log("Thông tin user:", req.user); // Kiểm tra dữ liệu user
-      if (req.user && req.user.admin === 1) {
+      if (req.user && req.user.is_admin == 1) {
         // Sử dụng === để so sánh chính xác
         next(); // Chỉ gọi next() nếu là admin
       } else {

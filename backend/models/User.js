@@ -21,6 +21,7 @@ class User {
       console.log("Database connection closed");
     }
   }
+
   // Tạo hàm thêm dữ liệu vào database
   static async insertUser(
     name,
@@ -85,26 +86,102 @@ class User {
       const [rows] = await user.connection.execute(query);
       return rows; // Trả về tất cả người dùng
     } catch (error) {
-      console.error("Khong lay duoc du lieu nguoi dung:", error);
+      console.error("Không lấy được dữ liệu người dùng:", error);
       throw error;
     } finally {
       await user.closeConnection(); // Đóng kết nối
     }
   }
 
-  // ham xoa nguoi dung
+  // Xóa người dùng
   static async delete(id) {
     const user = new User();
     await user.connect();
 
-    const query = `DELETE FROM user WHERE id=?`;
+    const query = `DELETE FROM user WHERE id = ?`;
 
     try {
-      const [result] = await user.connection.execute(query, [id]); // Thực hiện truy vấn
+      const [result] = await user.connection.execute(query, [id]);
       return result.affectedRows; // Trả về số bản ghi đã xóa
     } catch (error) {
       console.error("Lỗi khi xóa người dùng:", error);
       throw error;
+    } finally {
+      await user.closeConnection(); // Đóng kết nối
+    }
+  }
+
+  // Thêm phiên đăng nhập
+  static async insertSession(userId, accessToken, refreshToken, expiresAt) {
+    const user = new User();
+    await user.connect();
+
+    const query = `INSERT INTO user_sessions (user_id, access_token, refresh_token, expires_at) VALUES (?, ?, ?, ?)`;
+    const values = [userId, accessToken, refreshToken, expiresAt];
+
+    try {
+      const [result] = await user.connection.execute(query, values);
+      return result.insertId; // Trả về ID của phiên đã thêm
+    } catch (error) {
+      console.error("Error inserting session:", error);
+      throw error;
+    } finally {
+      await user.closeConnection(); // Đóng kết nối
+    }
+  }
+
+  // Lấy phiên đăng nhập theo userId
+  static async getSessionByUserId(userId) {
+    const user = new User();
+    await user.connect();
+
+    const query = `SELECT refresh_token FROM user_sessions WHERE user_id = ? ORDER BY session_id DESC LIMIT 1`;
+
+    try {
+      const [results] = await user.connection.execute(query, [userId]);
+      return results; // Trả về các phiên đăng nhập
+    } catch (error) {
+      console.error("Lỗi khi lấy phiên đăng nhập:", error);
+      throw error;
+    } finally {
+      await user.closeConnection(); // Đóng kết nối
+    }
+  }
+
+  // Xóa phiên đăng nhập
+  static async deleteSession(userId) {
+    const user = new User();
+    await user.connect();
+
+    const query = `DELETE FROM user_sessions WHERE user_id = ?`;
+
+    try {
+      const [result] = await user.connection.execute(query, [userId]);
+      return result.affectedRows; // Trả về số phiên đã xóa
+    } catch (error) {
+      console.error("Lỗi khi xóa phiên đăng nhập:", error);
+      throw error;
+    } finally {
+      await user.closeConnection(); // Đóng kết nối
+    }
+  }
+
+  // Cập nhật refresh token
+  static async updateRefreshToken(userId, newRefreshToken) {
+    const user = new User();
+    await user.connect();
+
+    const query = `UPDATE user_sessions SET refresh_token = ? WHERE user_id = ?`;
+
+    try {
+      const [result] = await user.connection.execute(query, [
+        newRefreshToken,
+        userId,
+      ]);
+      return result.affectedRows > 0; // Trả về true nếu có bản ghi được cập nhật
+    } catch (error) {
+      console.error("Error updating refresh token:", error);
+      return false; // Trả về false nếu có lỗi
     } finally {
       await user.closeConnection(); // Đóng kết nối
     }

@@ -3,7 +3,7 @@
 const express = require("express");
 
 const router = express.Router(); // Tạo đối tượng router
-
+const middlewares = require("../middlewares/authenticateToken");
 // import file controller/authController
 const authController = require("../controllers/authController");
 
@@ -15,5 +15,8 @@ router.post("/login", authController.loginUser);
 
 // dinh nghia route de refresh token
 router.post("/refresh", authController.requestRefreshToken);
+
+// dinh nghia route de logout
+router.post("/logout", middlewares.verifyToken, authController.userLogout);
 // Export router để sử dụng trong app.js
 module.exports = router;

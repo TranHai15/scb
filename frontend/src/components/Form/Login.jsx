@@ -1,10 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const {
@@ -19,9 +17,18 @@ export default function LoginPage() {
         "http://localhost:3000/auth/login",
         userData
       );
+      const { accessToken } = response.data;
+
+      // Lưu accessToken vào localStorage
+      localStorage.setItem("accessToken", accessToken);
       console.log("Đăng ký thành công:", response.data);
       setMessage(response.data);
-      navigate(`/`);
+
+      // Tải lại trang hoặc chuyển đến trang chủ
+      setTimeout(() => {
+        // Cách 1: Tải lại trang
+        window.location.reload();
+      }, 500); // 1 giây để người dùng có thời gian đọc thông báo
     } catch (error) {
       setError(
         error.response ? error.response.data : "Khong co phan hoi tu may chu"
