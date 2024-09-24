@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoter");
+const dataRouter = require("./routes/dataRoutes");
 dotenv.config(); // Đọc biến môi trường từ file .env
 
 const app = express();
@@ -26,6 +27,8 @@ app.get("/", (req, res) => {
 app.use("/auth", authRouter);
 // Sử dụng userRouter cho các route bắt đầu bằng /user
 app.use("/user", userRouter);
+// su dung userRouter cho cac roter lay application
+app.use("/api", dataRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
