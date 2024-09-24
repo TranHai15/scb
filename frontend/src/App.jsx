@@ -1,24 +1,24 @@
-import "./index.css";
+import React, { useEffect, useState } from "react"; // Thêm useState ở đây
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { Header } from "./components";
-import { Home } from "./components";
-import { Camera } from "./components";
-import { Image } from "./components";
-import { UserGuide } from "./components";
-import { LoginPage } from "./components";
-import { SignupPage } from "./components";
-// import { apiRequest } from "./api";
+import {
+  Header,
+  Home,
+  Camera,
+  Image,
+  UserGuide,
+  LoginPage,
+  SignupPage,
+  Overview,
+  ReportDetail,
+  NOTFOUND,
+  Bin,
+} from "./components"; // Import các component cần thiết
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // apiRequest()
-    //   .then((data) => console.log(data))
-    //   .catch((err) => console.error(err));
     const token = localStorage.getItem("accessToken");
-    // localStorage.clear();
     setIsAuthenticated(!!token); // Kiểm tra xem người dùng đã đăng nhập hay chưa
   }, []);
 
@@ -31,12 +31,26 @@ function App() {
           element={isAuthenticated ? <Camera /> : <Navigate to="/login" />}
         />
         <Route
+          path="/lichsu"
+          element={isAuthenticated ? <Overview /> : <NOTFOUND />}
+        />
+        <Route
+          path="/thungrac"
+          element={isAuthenticated ? <Bin /> : <NOTFOUND />}
+        />
+        <Route
+          path="/lichsuchitiet/:id"
+          element={
+            isAuthenticated ? <ReportDetail /> : <Navigate to="/login" />
+          }
+        />
+        <Route
           path="/fileImage"
           element={isAuthenticated ? <Image /> : <Navigate to="/login" />}
         />
         <Route
           path="/userguide"
-          element={isAuthenticated ? <UserGuide /> : <UserGuide />}
+          element={isAuthenticated ? <UserGuide /> : <Navigate to="/login" />}
         />
         <Route
           path="/login"

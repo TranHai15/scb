@@ -16,5 +16,5 @@ router.delete(
   userController.deleteUser
 );
 // dieu huong bat dang nhap
-// router.get("/userguide", middlewares.verifyToken);
+router.get("/lichsu", middlewares.verifyToken);
 module.exports = router;

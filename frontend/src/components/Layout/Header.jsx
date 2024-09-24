@@ -78,7 +78,7 @@ export default function Header() {
             </li>
             <li>
               <a
-                href="#"
+                href="/lichsu"
                 className="text-xl font-medium text-gray-800 hover:text-red-400"
               >
                 History Detection

@@ -26,10 +26,11 @@ export default function LoginPage() {
       localStorage.setItem("id", id);
       console.log("Đăng ký thành công:", response.data);
       // Tải lại trang hoặc chuyển đến trang chủ
+
       setTimeout(() => {
         // Cách 1: Tải lại trang
         window.location.reload();
-      }, 500); // 1 giây để người dùng có thời gian đọc thông báo
+      }, 300); // 1 giây để người dùng có thời gian đọc thông báo
     } catch (error) {
       setError(
         error.response ? error.response.data : "Khong co phan hoi tu may chu"

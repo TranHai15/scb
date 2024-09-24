@@ -136,12 +136,6 @@ const authController = {
 
   // Logout
   userLogout: async (req, res) => {
-    // const refreshToken = req.body.refreshToken;
-
-    // if (!refreshToken) {
-    //   return res.status(403).json("Không tìm thấy token để đăng xuất.");
-    // }
-
     await User.deleteSession(req.body.id);
     res.clearCookie("refreshToken", { path: "/", sameSite: "none" });
     res.status(200).json("Đăng xuất thành công.");
