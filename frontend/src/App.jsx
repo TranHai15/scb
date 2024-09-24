@@ -8,12 +8,17 @@ import { Image } from "./components";
 import { UserGuide } from "./components";
 import { LoginPage } from "./components";
 import { SignupPage } from "./components";
+// import { apiRequest } from "./api";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
+    // apiRequest()
+    //   .then((data) => console.log(data))
+    //   .catch((err) => console.error(err));
     const token = localStorage.getItem("accessToken");
+    // localStorage.clear();
     setIsAuthenticated(!!token); // Kiểm tra xem người dùng đã đăng nhập hay chưa
   }, []);
 

@@ -131,11 +131,16 @@ class User {
   }
 
   // Lấy phiên đăng nhập theo userId
-  static async getSessionByUserId(userId) {
+  static async getSessionByUserId(userId, check = false) {
     const user = new User();
     await user.connect();
 
-    const query = `SELECT refresh_token FROM user_sessions WHERE user_id = ? ORDER BY session_id DESC LIMIT 1`;
+    let query = "";
+    if (check) {
+      query = `SELECT refresh_token  FROM user_sessions WHERE user_id = ?`;
+    } else {
+      query = `SELECT COUNT(*) AS session_count FROM user_sessions WHERE user_id = ? `;
+    }
 
     try {
       const [results] = await user.connection.execute(query, [userId]);

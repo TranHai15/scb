@@ -44,7 +44,7 @@ const authController = {
     return jwt.sign(
       { id: user.id, is_admin: user.is_admin },
       process.env.JWT_ACCESS_TOKEN,
-      { expiresIn: "120s" }
+      { expiresIn: "60s" }
     );
   },
 
@@ -66,40 +66,31 @@ const authController = {
     }
 
     try {
-      const emailExists = await User.checkEmailExists(email);
-      if (!emailExists) {
+      const user = await User.checkEmailExists(email, true);
+      if (!user) {
         return res.status(400).json("Email không tồn tại.");
       }
 
-      const dataUser = await User.checkEmailExists(email, true);
-      const checkpass = await bcryptjs.compare(password, dataUser.password);
-
-      if (!checkpass) {
+      const isPasswordValid = await bcryptjs.compare(password, user.password);
+      if (!isPasswordValid) {
         return res.status(401).json("Mật khẩu sai");
       }
 
-      const accessToken = authController.createAccessToken(dataUser);
-      const refreshToken = authController.createRefreshToken(dataUser);
+      const session = await User.getSessionByUserId(user.id, true);
+      let accessToken, refreshToken;
 
-      // Lưu refresh token vào cơ sở dữ liệu
-      const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Thời gian hết hạn 365 ngày
-      await User.insertSession(
-        dataUser.id,
-        accessToken,
-        refreshToken,
-        expiresAt
-      );
+      if (session.length > 0) {
+        accessToken = authController.createAccessToken(user);
+        refreshToken = session[0].refresh_token;
+      } else {
+        accessToken = authController.createAccessToken(user);
+        refreshToken = authController.createRefreshToken(user);
+        const expiresAt = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        await User.insertSession(user.id, accessToken, refreshToken, expiresAt);
+      }
 
-      // Lưu refresh token vào cookie
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        path: "/",
-        sameSite: "strict",
-      });
-
-      const { password: pwd, ...data } = dataUser;
-      // console.log("data", { data });
-      res.status(200).json({ data, accessToken });
+      const { password: pwd, ...userData } = user;
+      res.status(200).json({ id: user.id, accessToken, refreshToken });
     } catch (error) {
       res.status(500).json("Đã xảy ra lỗi khi đăng nhập");
     }
@@ -107,21 +98,14 @@ const authController = {
 
   // Refresh token
   requestRefreshToken: async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
-    // console.log("refresh", refreshToken);
+    const refreshToken = req.body.refreshToken;
     if (!refreshToken) {
-      return res.status(401).json("Bạn chưa đăng nhập, chưa có cookie");
+      return res.status(401).json("Bạn chưa đăng nhập.");
     }
 
     try {
-      // console.log("id", req.user.id);
-      // Kiểm tra refresh token trong cơ sở dữ liệu
-      const session = await User.getSessionByUserId(4);
-
-      console.log("session", session[0].refresh_token);
-      const tokenExists = session[0].refresh_token === refreshToken;
-
-      // console.log("mes", tokenExists);
+      const session = await User.getSessionByUserId(req.body.id, true);
+      const tokenExists = session[0]?.refresh_token === refreshToken;
 
       if (!tokenExists) {
         return res.status(403).json("Token này không phải là của tôi");
@@ -135,20 +119,14 @@ const authController = {
             return res.status(403).json("Refresh token không hợp lệ");
           }
 
-          // Xóa refresh token cũ và thêm token mới vào cơ sở dữ liệu
-          await User.updateRefreshToken(user.id, refreshToken);
           const newAccessToken = authController.createAccessToken(user);
           const newRefreshToken = authController.createRefreshToken(user);
+          await User.updateRefreshToken(user.id, newRefreshToken);
 
-          await User.updateRefreshToken(user.id, newRefreshToken); // Cập nhật refresh token mới
-
-          res.cookie("refreshToken", newRefreshToken, {
-            httpOnly: true,
-            path: "/",
-            sameSite: "strict",
+          res.status(200).json({
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken,
           });
-
-          return res.status(200).json({ accessToken: newAccessToken });
         }
       );
     } catch (error) {
@@ -158,18 +136,15 @@ const authController = {
 
   // Logout
   userLogout: async (req, res) => {
-    const refreshToken = req.cookies.refreshToken; // Lấy token từ cookie
-    if (!refreshToken) {
-      return res.status(403).json("Không tìm thấy token để đăng xuất.");
-    }
+    // const refreshToken = req.body.refreshToken;
 
-    // Xóa token trong cơ sở dữ liệu
-    await User.deleteSession(req.user.id);
+    // if (!refreshToken) {
+    //   return res.status(403).json("Không tìm thấy token để đăng xuất.");
+    // }
 
-    // Xóa cookie
-    res.clearCookie("refreshToken", { path: "/", sameSite: "strict" });
-
-    return res.status(200).json("Đăng xuất thành công.");
+    await User.deleteSession(req.body.id);
+    res.clearCookie("refreshToken", { path: "/", sameSite: "none" });
+    res.status(200).json("Đăng xuất thành công.");
   },
 };
 

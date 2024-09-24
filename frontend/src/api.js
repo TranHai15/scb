@@ -1,47 +1,65 @@
 import axios from "axios";
 
-// Kiểm tra và refresh token khi access token hết hạn: Mỗi khi gửi request tới API, bạn cần kiểm tra
-// nếu accessToken hết hạn thì sẽ sử dụng refreshToken để lấy token mới từ backend.
-
+// Kiểm tra và refresh token khi access token hết hạn
 const refreshToken = async () => {
+  console.log("Refreshing token...");
   try {
     const response = await axios.post(
       "http://localhost:3000/auth/refresh",
-      null,
+      {}, // Không cần gửi body
       {
-        withCredentials: true, // Để gửi cookie chứa refresh token
+        withCredentials: false, // Không cần gửi cookie
       }
     );
-    const { accessToken } = response.data;
+    const { accessToken, refreshToken } = response.data;
 
-    // Lưu accessToken mới vào localStorage
+    // Lưu accessToken và refreshToken mới vào localStorage
     localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
 
     return accessToken;
   } catch (error) {
     console.error("Không thể làm mới token", error);
+    throw error; // Thêm throw để xử lý lỗi ở bên ngoài
   }
 };
 
-// Tạo hàm để gửi request có token: Khi gửi các request khác lên server,
-//  bạn cần kiểm tra nếu token đã hết hạn thì lấy token mới bằng cách sử dụng refreshToken.
+// Tạo hàm để gửi request có token
 const apiRequest = async () => {
   let accessToken = localStorage.getItem("accessToken");
+  let refreshToken = localStorage.getItem("refreshToken");
+  let id = localStorage.getItem("id");
 
   try {
-    const response = await axios.post("http://localhost:3000/auth/refresh", {
-      headers: { authorization: `Bearer ${accessToken}` },
-    });
+    const response = await axios.post(
+      "http://localhost:3000/auth/refresh",
+      {
+        accessToken,
+        refreshToken,
+        id,
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      }
+    );
     return response.data;
   } catch (error) {
-    if (error.response.status === 401) {
+    if (error.response && error.response.status === 401) {
       // Token hết hạn, lấy token mới
-      accessToken = await refreshToken();
-
+      console.log("Token expired. Refreshing...");
+      accessToken = await refreshToken(); // Gọi hàm refreshToken
       // Gửi lại request với token mới
-      const response = await axios.post("http://localhost:3000/auth/refresh", {
-        headers: { authorization: `Bearer ${accessToken}` },
-      });
+      const response = await axios.post(
+        "http://localhost:3000/auth/refresh",
+        {
+          accessToken,
+          refreshToken,
+          id,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
       return response.data;
     }
     throw error;

@@ -10,7 +10,6 @@ const dataUser = {
       if (!dataAllUser) {
         return res.status(404).json({ message: "Không tìm thấy người dùng." });
       }
-
       console.log("useer", dataAllUser);
       return res.status(200).json(dataAllUser);
     } catch (error) {

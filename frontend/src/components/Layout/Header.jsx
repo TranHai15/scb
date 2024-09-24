@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { apiRequest } from "../../api"; // Import hàm refreshToken đã tạo trước đó
 
 export default function Header() {
   const navigate = useNavigate();
@@ -15,36 +14,33 @@ export default function Header() {
   }, []);
 
   const logoutUser = async () => {
-    try {
-      // Gửi yêu cầu đăng xuất qua apiRequest
-      const response = await apiRequest(); // Gọi hàm apiRequest trước
+    const id = localStorage.getItem("id");
+    if (!id) {
+      console.error("Không tìm thấy id .");
+      return;
+    }
 
-      // Tiến hành đăng xuất
+    try {
       const logoutResponse = await axios.post(
-        "http://localhost:3000/auth/logout", // Địa chỉ API logout
-        {},
-        {
-          headers: { authorization: `Bearer ${response.accessToken}` }, // Sử dụng access token mới
-          withCredentials: true,
-        }
+        "http://localhost:3000/auth/logout",
+        { id }
       );
 
       console.log("Đăng xuất thành công:", logoutResponse.data);
 
       // Xóa token khỏi localStorage và cập nhật trạng thái đăng nhập
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("id");
       setIsLoggedIn(false);
       navigate("/"); // Điều hướng về trang chính
+
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (error) {
       console.error("Lỗi khi đăng xuất:", error);
     }
-  };
-
-  const handleLogout = () => {
-    logoutUser(); // Gọi hàm logoutUser khi nhấn nút logout
   };
 
   return (
@@ -89,29 +85,29 @@ export default function Header() {
               </a>
             </li>
           </ul>
-          <div className="flex gap-5">
+          <div>
             {isLoggedIn ? (
               <button
-                className="bg-red-100 py-2 px-4 text-lg rounded hover:bg-red-200 transition"
-                onClick={handleLogout}
+                onClick={logoutUser}
+                className="bg-red-300 text-xl p-2 rounded-lg font-medium hover:bg-red-500 transition-all"
               >
-                Log out
+                Đăng xuất
               </button>
             ) : (
-              <>
-                <button
-                  className="bg-red-100 py-2 px-4 text-lg rounded hover:bg-red-200 transition"
-                  onClick={() => navigate(`/signup`)}
+              <div>
+                <a
+                  href="/login"
+                  className="bg-red-300 text-xl p-2 rounded-lg font-medium hover:bg-red-500 transition-all"
                 >
-                  Sign up
-                </button>
-                <button
-                  className="bg-red-100 py-2 px-4 text-lg rounded hover:bg-red-200 transition"
-                  onClick={() => navigate(`/login`)}
+                  Đăng nhập
+                </a>
+                <a
+                  href="/signup"
+                  className="bg-red-300 text-xl p-2 rounded-lg font-medium hover:bg-red-500 transition-all ml-3"
                 >
-                  Log in
-                </button>
-              </>
+                  Đăng ký
+                </a>
+              </div>
             )}
           </div>
         </nav>

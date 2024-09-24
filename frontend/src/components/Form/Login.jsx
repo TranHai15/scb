@@ -3,7 +3,6 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function LoginPage() {
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const {
     register,
@@ -17,13 +16,15 @@ export default function LoginPage() {
         "http://localhost:3000/auth/login",
         userData
       );
-      const { accessToken } = response.data;
+      const { id, accessToken, refreshToken } = response.data;
 
       // Lưu accessToken vào localStorage
       localStorage.setItem("accessToken", accessToken);
+      // luu refreshtoken vao localStorage
+      localStorage.setItem("refreshToken", refreshToken);
+      // luu data vao localstroage
+      localStorage.setItem("id", id);
       console.log("Đăng ký thành công:", response.data);
-      setMessage(response.data);
-
       // Tải lại trang hoặc chuyển đến trang chủ
       setTimeout(() => {
         // Cách 1: Tải lại trang
