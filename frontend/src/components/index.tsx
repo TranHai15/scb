@@ -9,6 +9,7 @@ import Overview from "./distrory/Homedistrory";
 import ReportDetail from "./distrory/chitietdistrory";
 import Bin from "./distrory/histoy";
 import NOTFOUND from "./Layout/404";
+import Trangmoi from "./distrory/trangmoi";
 
 export {
   Camera,
@@ -22,4 +23,5 @@ export {
   ReportDetail,
   NOTFOUND,
   Bin,
+  Trangmoi,
 };

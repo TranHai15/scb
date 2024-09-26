@@ -7,8 +7,10 @@ const middlewares = require("../middlewares/authenticateToken");
 // import file controller/authController
 const dataController = require("../controllers/dataController");
 //  lay api du lieu
-router.get("/callApi", dataController.callApi);
+router.post("/callApi", dataController.callApi);
 // lay toan bo du lieu cua mot nguoi dung
 router.post("/takeApi/:id", dataController.getAllData);
+// uploade hinh anh
+router.post("/upload", dataController.uplodeImg);
 
 module.exports = router;

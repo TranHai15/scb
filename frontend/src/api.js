@@ -66,4 +66,21 @@ const apiRequest = async () => {
   }
 };
 
-export { apiRequest, refreshToken };
+const getCurrentDateTime = () => {
+  const now = new Date(); // Lấy thời gian hiện tại
+
+  // Lấy ngày, tháng, năm
+  const day = String(now.getDate()).padStart(2, "0"); // Ngày
+  const month = String(now.getMonth() + 1).padStart(2, "0"); // Tháng (tăng 1 vì tháng bắt đầu từ 0)
+  const year = now.getFullYear(); // Năm
+
+  // Lấy giờ, phút, giây
+  const hours = String(now.getHours()).padStart(2, "0"); // Giờ
+  const minutes = String(now.getMinutes()).padStart(2, "0"); // Phút
+  const seconds = String(now.getSeconds()).padStart(2, "0"); // Giây
+
+  // Trả về định dạng DD/MM/YYYY HH:mm:ss
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+};
+
+export { apiRequest, refreshToken, getCurrentDateTime };

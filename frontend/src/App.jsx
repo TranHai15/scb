@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"; // Thêm useState ở đây
 import { Routes, Route, Navigate } from "react-router-dom";
+
 import {
   Header,
   Home,
@@ -12,6 +13,7 @@ import {
   ReportDetail,
   NOTFOUND,
   Bin,
+  Trangmoi,
 } from "./components"; // Import các component cần thiết
 
 function App() {
@@ -25,6 +27,7 @@ function App() {
   return (
     <>
       <Header />
+
       <Routes>
         <Route
           path="/camera"
@@ -43,6 +46,10 @@ function App() {
           element={
             isAuthenticated ? <ReportDetail /> : <Navigate to="/login" />
           }
+        />
+        <Route
+          path="/trangmoi"
+          element={isAuthenticated ? <Trangmoi /> : <Navigate to="/login" />}
         />
         <Route
           path="/fileImage"

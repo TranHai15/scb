@@ -24,7 +24,6 @@ class MachDien {
   // Thêm một mạch điện mới
   static async insertMach(anh_mach, so_loi, bao_cao, ngay_them, id) {
     const machDien = new MachDien();
-    console.log("check red");
     await machDien.connect();
 
     const insert = `

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-
+// import Header from "../../";
 const reportsData = [
   {
     id: 1,
@@ -43,8 +43,8 @@ const Bin = () => {
         {reportsData.map((report) => (
           <div key={report.id} className="border p-4 rounded">
             <img
-              src={report.imageUrl}
-              alt="Report"
+              src="../../assets/image_1727337711076.png"
+              alt="Anh dep"
               className="w-full h-auto mb-2"
             />
             <p
